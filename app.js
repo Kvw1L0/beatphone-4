@@ -1,54 +1,13 @@
 const CONFIG = Object.freeze({ target: 4800, turnTarget: 300, tapValue: 5, threshold: 18, cooldown: 50 });
-
 const state = { active: false, total: 0, turn: 0, player: 1, lastBeat: 0 };
 const ui = Object.fromEntries(["beats", "turn-beats", "player-number", "total-progress", "turn-progress", "status", "hint", "start-button", "overlay", "modal-title", "modal-copy", "modal-detail", "continue-button"].map(id => [id, document.getElementById(id)]));
-
-function render() {
-  ui.beats.textContent = state.total;
-  ui["turn-beats"].textContent = state.turn;
-  ui["player-number"].textContent = `${state.player} / ${CONFIG.target / CONFIG.turnTarget}`;
-  ui["total-progress"].style.width = `${state.total / CONFIG.target * 100}%`;
-  ui["turn-progress"].style.width = `${state.turn / CONFIG.turnTarget * 100}%`;
-}
-
-function showRelay() {
-  state.active = false;
-  const finished = state.total === CONFIG.target;
-  ui["modal-title"].textContent = finished ? "¡DESAFÍO COMPLETADO!" : "¡CAMBIO DE PERSONA!";
-  ui["modal-copy"].textContent = finished ? `El equipo logró los ${CONFIG.target} movimientos.` : "Este turno ya completó 300 movimientos.";
-  ui["modal-detail"].textContent = finished ? `Participaron ${CONFIG.target / CONFIG.turnTarget} personas. ¡Buen trabajo!` : `Pásale el teléfono a la persona ${state.player + 1}.`;
-  ui["continue-button"].textContent = finished ? "JUGAR OTRA VEZ" : "PERSONA LISTA";
-  ui.overlay.hidden = false;
-}
-
-function addBeat(amount) {
-  if (!state.active) return;
-  const available = Math.min(amount, CONFIG.target - state.total, CONFIG.turnTarget - state.turn);
-  state.total += available;
-  state.turn += available;
-  render();
-  if (navigator.vibrate) navigator.vibrate(10);
-  if (state.turn === CONFIG.turnTarget || state.total === CONFIG.target) showRelay();
-}
-
-function begin() {
-  state.active = true;
-  ui["start-button"].hidden = true;
-  ui.hint.textContent = "¡Dale! Sacude o toca para sumar movimientos.";
-  ui.status.textContent = `Turno de la persona ${state.player}`;
-}
-
+function render() { ui.beats.textContent = state.total; ui["turn-beats"].textContent = state.turn; ui["player-number"].textContent = state.player + " / " + (CONFIG.target / CONFIG.turnTarget); ui["total-progress"].style.width = (state.total / CONFIG.target * 100) + "%"; ui["turn-progress"].style.width = (state.turn / CONFIG.turnTarget * 100) + "%"; }
+function showRelay() { state.active = false; const finished = state.total === CONFIG.target; ui["modal-title"].textContent = finished ? "¡DESAFÍO COMPLETADO!" : "¡CAMBIO DE PERSONA!"; ui["modal-copy"].textContent = finished ? "El equipo logró los " + CONFIG.target + " movimientos." : "Este turno ya completó 300 movimientos."; ui["modal-detail"].textContent = finished ? "Participaron " + (CONFIG.target / CONFIG.turnTarget) + " personas. ¡Buen trabajo!" : "Pásale el teléfono a la persona " + (state.player + 1) + "."; ui["continue-button"].textContent = finished ? "JUGAR OTRA VEZ" : "PERSONA LISTA"; ui.overlay.hidden = false; }
+function addBeat(amount) { if (!state.active) return; const available = Math.min(amount, CONFIG.target - state.total, CONFIG.turnTarget - state.turn); state.total += available; state.turn += available; render(); if (navigator.vibrate) navigator.vibrate(10); if (state.turn === CONFIG.turnTarget || state.total === CONFIG.target) showRelay(); }
+function startTurn() { state.active = true; ui["start-button"].hidden = true; ui.hint.textContent = "¡Dale! Sacude o toca para sumar movimientos."; ui.status.textContent = "Turno de la persona " + state.player; }
+function begin() { ui["start-button"].disabled = true; let count = 3; ui.status.textContent = count; ui.hint.textContent = "Prepárate para batir el teléfono"; const countdown = setInterval(() => { count -= 1; if (count > 0) { ui.status.textContent = count; return; } clearInterval(countdown); startTurn(); }, 1000); }
 ui["start-button"].addEventListener("click", begin);
-ui["continue-button"].addEventListener("click", () => {
-  if (state.total === CONFIG.target) { Object.assign(state, { active: false, total: 0, turn: 0, player: 1 }); render(); ui.overlay.hidden = true; ui["start-button"].hidden = false; ui.status.textContent = "Prepara al equipo"; return; }
-  state.player += 1; state.turn = 0; ui.overlay.hidden = true; begin(); render();
-});
+ui["continue-button"].addEventListener("click", () => { if (state.total === CONFIG.target) { Object.assign(state, { active: false, total: 0, turn: 0, player: 1 }); render(); ui.overlay.hidden = true; ui["start-button"].hidden = false; ui["start-button"].disabled = false; ui["start-button"].textContent = "¡YA!"; ui.status.textContent = "Prepara al equipo"; return; } state.player += 1; state.turn = 0; ui.overlay.hidden = true; ui["start-button"].hidden = false; ui["start-button"].disabled = false; ui["start-button"].textContent = "¡YA!"; ui.status.textContent = "Persona " + state.player + ", prepárate"; ui.hint.textContent = "Pulsa ¡YA! para iniciar la cuenta regresiva."; render(); });
 document.addEventListener("click", event => { if (event.target.closest("button")) return; const now = Date.now(); if (now - state.lastBeat >= CONFIG.cooldown) { state.lastBeat = now; addBeat(CONFIG.tapValue); } });
-window.addEventListener("devicemotion", event => {
-  const a = event.accelerationIncludingGravity || event.acceleration;
-  if (!a) return;
-  const force = Math.abs(a.x || 0) + Math.abs(a.y || 0) + Math.abs(a.z || 0);
-  const now = Date.now();
-  if (force > CONFIG.threshold && now - state.lastBeat >= CONFIG.cooldown) { state.lastBeat = now; addBeat(1); }
-});
+window.addEventListener("devicemotion", event => { const a = event.accelerationIncludingGravity || event.acceleration; if (!a) return; const force = Math.abs(a.x || 0) + Math.abs(a.y || 0) + Math.abs(a.z || 0); const now = Date.now(); if (force > CONFIG.threshold && now - state.lastBeat >= CONFIG.cooldown) { state.lastBeat = now; addBeat(1); } });
 render();
