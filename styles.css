@@ -1,0 +1,27 @@
+:root { --blue: #13c8ff; --navy: #081a4b; --yellow: #fff32b; --ink: #02040d; }
+* { box-sizing: border-box; }
+body { margin: 0; min-height: 100svh; background: radial-gradient(circle at 50% 0%, #1568aa 0, #081a4b 45%, #02040d 100%); color: white; font-family: "Press Start 2P", monospace; }
+button { font: inherit; cursor: pointer; }
+.app { min-height: 100svh; display: grid; place-items: center; padding: 24px 16px; }
+.game-card, .modal { width: min(100%, 460px); background: rgba(3, 10, 34, .9); border: 4px solid var(--blue); border-radius: 18px; padding: 28px 22px; text-align: center; box-shadow: 0 0 20px var(--blue), inset 0 0 35px rgba(19,200,255,.18); }
+.brand { color: var(--blue); font-size: clamp(1.3rem, 6vw, 2rem); text-shadow: 3px 3px 0 #000; line-height: 1.35; }
+.brand span { color: var(--yellow); }
+.status, .hint, .modal p { font-size: .68rem; line-height: 1.75; }
+.status { color: var(--yellow); margin: 28px 0 20px; }
+.beat-display strong { display: block; color: var(--blue); font-size: clamp(2.2rem, 13vw, 4rem); line-height: 1.25; }
+.beat-display span, .turn-card span { font-size: .55rem; color: #c9eafa; }
+.progress-track { height: 17px; margin: 16px 0 24px; border: 2px solid var(--blue); background: #000; border-radius: 999px; overflow: hidden; }
+.progress-track.small { height: 12px; margin: 14px 0 0; }
+.progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--blue), var(--yellow)); transition: width .12s linear; }
+.turn-card { padding: 18px; border: 2px solid rgba(19,200,255,.7); border-radius: 12px; background: rgba(0,0,0,.28); }
+.turn-card strong { display: block; margin: 12px 0; color: var(--yellow); font-size: 1rem; }
+.turn-card p { margin: 0; font-size: .64rem; line-height: 1.7; }
+.primary { width: 100%; margin-top: 26px; padding: 18px 10px; border: 0; border-radius: 9px; background: var(--blue); color: #001127; box-shadow: 0 5px 0 #0069a4; font-size: .8rem; }
+.primary:active { transform: translateY(5px); box-shadow: none; }
+.hint { color: #c9eafa; margin: 24px 0 0; }
+.overlay { position: fixed; inset: 0; display: grid; place-items: center; padding: 20px; background: rgba(0,0,0,.78); backdrop-filter: blur(6px); z-index: 2; }
+.modal { animation: arrive .28s ease-out; }
+.eyebrow { color: var(--yellow); margin: 0 0 18px; }
+.modal h1 { color: var(--blue); font-size: 1.2rem; line-height: 1.6; margin: 0 0 22px; }
+.modal-detail { color: var(--yellow); margin-top: 22px !important; }
+@keyframes arrive { from { transform: scale(.86); opacity: 0; } to { transform: scale(1); opacity: 1; } }
