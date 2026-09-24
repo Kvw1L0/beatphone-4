@@ -25,3 +25,5 @@ button { font: inherit; cursor: pointer; }
 .modal h1 { color: var(--blue); font-size: 1.2rem; line-height: 1.6; margin: 0 0 22px; }
 .modal-detail { color: var(--yellow); margin-top: 22px !important; }
 @keyframes arrive { from { transform: scale(.86); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+.overlay[hidden] { display: none !important; }
